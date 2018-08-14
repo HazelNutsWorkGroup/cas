@@ -4,9 +4,11 @@ import org.apereo.cas.audit.config.CasSupportJdbcAuditConfiguration;
 import org.apereo.cas.audit.spi.BaseAuditConfigurationTests;
 import org.apereo.cas.audit.spi.config.CasCoreAuditConfiguration;
 import org.apereo.cas.configuration.CasConfigurationProperties;
+import org.apereo.cas.util.junit.ConditionalIgnoreRule;
 
 import lombok.Getter;
 import org.apereo.inspektr.audit.AuditTrailManager;
+import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
@@ -32,6 +34,9 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = "cas.audit.jdbc.asynchronous=false")
 @Getter
 public class CasSupportJdbcAuditConfigurationTests extends BaseAuditConfigurationTests {
+    @Rule
+    public final ConditionalIgnoreRule conditionalIgnoreRule = new ConditionalIgnoreRule();
+
     @Autowired
     @Qualifier("jdbcAuditTrailManager")
     private AuditTrailManager auditTrailManager;

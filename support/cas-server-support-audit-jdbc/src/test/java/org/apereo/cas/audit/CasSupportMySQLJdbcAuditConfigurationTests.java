@@ -25,6 +25,4 @@ import org.springframework.test.context.TestPropertySource;
 @ConditionalIgnore(condition = RunningContinuousIntegrationCondition.class, port = 3306)
 @Category(MySQLCategory.class)
 public class CasSupportMySQLJdbcAuditConfigurationTests extends CasSupportJdbcAuditConfigurationTests {
-    @Rule
-    public final ConditionalIgnoreRule conditionalIgnoreRule = new ConditionalIgnoreRule();
 }
