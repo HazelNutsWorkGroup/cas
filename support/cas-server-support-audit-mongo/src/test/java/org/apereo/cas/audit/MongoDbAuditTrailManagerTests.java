@@ -1,18 +1,17 @@
 package org.apereo.cas.audit;
 
+import org.apereo.cas.audit.spi.BaseAuditConfigurationTests;
 import org.apereo.cas.audit.spi.config.CasCoreAuditConfiguration;
 import org.apereo.cas.category.MongoDbCategory;
 import org.apereo.cas.config.CasCoreUtilConfiguration;
 import org.apereo.cas.config.CasCoreWebConfiguration;
 import org.apereo.cas.config.CasSupportMongoDbAuditConfiguration;
 import org.apereo.cas.config.support.CasWebApplicationServiceFactoryConfiguration;
-import org.apereo.cas.util.DateTimeUtils;
 
-import lombok.val;
-import org.apereo.inspektr.audit.AuditActionContext;
+import lombok.Getter;
+import org.apereo.inspektr.audit.AuditTrailManager;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,10 +20,6 @@ import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-
-import java.time.LocalDate;
-
-import static org.junit.Assert.*;
 
 /**
  * This is {@link MongoDbAuditTrailManagerTests}.
@@ -40,9 +35,18 @@ import static org.junit.Assert.*;
         CasWebApplicationServiceFactoryConfiguration.class,
         RefreshAutoConfiguration.class,
         CasCoreWebConfiguration.class})
-@TestPropertySource(locations = {"classpath:/mongoaudit.properties"})
+@TestPropertySource(properties = {
+    "cas.audit.mongo.host=ds135522.mlab.com",
+    "cas.audit.mongo.port=35522",
+    "cas.audit.mongo.userId=casuser",
+    "cas.audit.mongo.password=Mellon",
+    "cas.audit.mongo.databaseName=jasigcas",
+    "cas.audit.mongo.dropCollection=true",
+    "cas.audit.mongo.asynchronous=false"
+})
 @Category(MongoDbCategory.class)
-public class MongoDbAuditTrailManagerTests {
+@Getter
+public class MongoDbAuditTrailManagerTests extends BaseAuditConfigurationTests {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
@@ -51,19 +55,6 @@ public class MongoDbAuditTrailManagerTests {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Autowired
-    @Qualifier("auditTrailExecutionPlan")
-    private AuditTrailExecutionPlan auditTrailExecutionPlan;
-
-    @Test
-    public void verify() {
-        val twoDaysAgo = LocalDate.now().minusDays(2);
-        val since = DateTimeUtils.dateOf(twoDaysAgo);
-        val ctx = new AuditActionContext("casuser", "resource",
-            "action", "appcode", since, "clientIp",
-            "serverIp");
-        auditTrailExecutionPlan.record(ctx);
-
-        val results = auditTrailExecutionPlan.getAuditRecordsSince(twoDaysAgo);
-        assertFalse(results.isEmpty());
-    }
+    @Qualifier("mongoDbAuditTrailManager")
+    private AuditTrailManager auditTrailManager;
 }
